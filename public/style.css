@@ -1,0 +1,275 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif;
+  background: #f5f5f5;
+  color: #333;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.container {
+  background: #fff;
+  border-radius: 12px;
+  padding: 40px;
+  width: 100%;
+  max-width: 480px;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
+}
+
+.admin {
+  max-width: 700px;
+}
+
+h1 {
+  font-size: 1.6rem;
+  margin-bottom: 8px;
+  color: #1a1a1a;
+}
+
+.subtitle {
+  color: #777;
+  margin-bottom: 28px;
+  font-size: 0.95rem;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+input[type="text"],
+input[type="number"] {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1.5px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+  font-family: inherit;
+}
+
+input:focus {
+  outline: none;
+  border-color: #4f46e5;
+}
+
+button[type="submit"] {
+  width: 100%;
+  padding: 14px;
+  background: #4f46e5;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-top: 8px;
+  font-family: inherit;
+}
+
+button[type="submit"]:hover {
+  background: #4338ca;
+}
+
+.error {
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-bottom: 20px;
+  font-size: 0.9rem;
+}
+
+/* Thanks page */
+.thanks {
+  text-align: center;
+}
+
+.top-image {
+  width: 100%;
+  max-width: 400px;
+  border-radius: 10px;
+  margin-bottom: 24px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.event-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 14px;
+}
+
+.thanks-body {
+  color: #444;
+  line-height: 1.9;
+  font-size: 0.95rem;
+  margin-bottom: 24px;
+}
+
+.reservation-box {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 20px 24px;
+  text-align: left;
+  margin-bottom: 20px;
+  line-height: 2;
+}
+
+.reservation-label {
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #1a1a1a;
+}
+
+.reservation-box p {
+  margin: 0;
+  color: #374151;
+}
+
+.thanks-footer {
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 28px;
+  font-size: 1rem;
+}
+
+.back-link {
+  display: inline-block;
+  padding: 12px 28px;
+  background: #f3f4f6;
+  color: #374151;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.back-link:hover {
+  background: #e5e7eb;
+}
+
+/* Admin page */
+.total {
+  margin-bottom: 24px;
+  font-size: 1rem;
+  color: #555;
+}
+
+.empty {
+  color: #999;
+  text-align: center;
+  padding: 40px 0;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+th {
+  background: #f9fafb;
+  padding: 12px 14px;
+  text-align: left;
+  font-weight: 600;
+  border-bottom: 2px solid #e5e7eb;
+  color: #374151;
+}
+
+td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+tr:hover td {
+  background: #f9fafb;
+}
+
+/* Admin settings section */
+.admin-settings {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 24px;
+  margin-bottom: 40px;
+}
+
+.admin-settings h2 {
+  font-size: 1.1rem;
+  margin-bottom: 20px;
+  color: #374151;
+}
+
+.admin-settings textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1.5px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.admin-settings textarea:focus {
+  outline: none;
+  border-color: #4f46e5;
+}
+
+.admin-settings input[type="file"] {
+  margin-bottom: 4px;
+}
+
+.admin-settings small {
+  display: block;
+  color: #9ca3af;
+  font-size: 0.8rem;
+  margin-top: 4px;
+}
+
+.admin-settings button[type="submit"] {
+  width: auto;
+  padding: 10px 24px;
+  margin-top: 16px;
+}
+
+.current-image {
+  margin-bottom: 12px;
+}
+
+/* Admin message on thanks page */
+.admin-message {
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  text-align: left;
+  white-space: pre-wrap;
+  line-height: 1.8;
+  font-size: 0.95rem;
+  color: #92400e;
+}

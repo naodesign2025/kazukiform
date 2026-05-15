@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>予約完了</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="container thanks">
+    <% if (settings && settings.image_filename) { %>
+      <img src="/uploads/<%= settings.image_filename %>" alt="KAZUKI" class="top-image">
+    <% } else { %>
+      <img src="/images/kazuki.png" alt="KAZUKI" class="top-image">
+    <% } %>
+
+    <p class="event-title">-堀次一輝ソロライブについて-</p>
+
+    <p class="thanks-body">
+      この度は2026年8月16日(日)開催、<br>
+      【KAZUKI HORITSUGI SOLO LIVE】の<br>
+      ご予約いただき、ありがとうございます。
+    </p>
+
+    <div class="reservation-box">
+      <p class="reservation-label">《ご予約内容》</p>
+      <p>① <%= name %>様</p>
+      <p>② <%= count %>名</p>
+      <p>③ 整理番号<%= String(number).padStart(2, '0') %>番</p>
+    </div>
+
+    <p class="thanks-footer">上記内容でご予約を承りました。😄</p>
+
+    <% if (settings && settings.message) { %>
+      <div class="admin-message">
+        <p><%= settings.message %></p>
+      </div>
+    <% } %>
+
+    <a href="/" class="back-link">フォームに戻る</a>
+  </div>
+</body>
+</html>

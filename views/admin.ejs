@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>管理者ページ - 予約一覧</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="container admin">
+    <h1>管理者設定</h1>
+
+    <section class="admin-settings">
+      <h2>予約完了ページの設定</h2>
+      <form action="/admin/settings" method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+          <label>表示画像</label>
+          <% if (settings && settings.image_filename) { %>
+            <div class="current-image">
+              <img src="/uploads/<%= settings.image_filename %>" alt="現在の画像" style="max-width:200px; display:block; margin-bottom:8px;">
+              <small>現在設定中の画像</small>
+            </div>
+          <% } %>
+          <input type="file" name="image" accept="image/*">
+          <small>アップロードしない場合は現在の画像を維持します</small>
+        </div>
+        <div class="form-group">
+          <label for="message">メッセージ</label>
+          <textarea id="message" name="message" rows="4" placeholder="予約完了ページに表示するメッセージを入力..."><%= (settings && settings.message) ? settings.message : '' %></textarea>
+        </div>
+        <button type="submit">設定を保存</button>
+      </form>
+    </section>
+
+    <h1>予約一覧</h1>
+    <p class="total">合計人数：<strong><%= total %>名</strong>（<%= reservations.length %>件）</p>
+
+    <% if (reservations.length === 0) { %>
+      <p class="empty">まだ予約はありません。</p>
+    <% } else { %>
+      <table>
+        <thead>
+          <tr>
+            <th>No.</th>
+            <th>お名前</th>
+            <th>人数</th>
+            <th>予約日時</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% reservations.forEach((r, i) => { %>
+            <tr>
+              <td><%= reservations.length - i %></td>
+              <td><%= r.name %></td>
+              <td><%= r.count %>名</td>
+              <td><%= new Date(r.created_at).toLocaleString('ja-JP') %></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    <% } %>
+  </div>
+</body>
+</html>

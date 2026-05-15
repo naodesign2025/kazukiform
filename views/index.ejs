@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ライブ予約フォーム</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>ライブ予約フォーム</h1>
+    <p class="subtitle">ご予約をお待ちしています</p>
+
+    <% if (typeof error !== 'undefined') { %>
+      <p class="error"><%= error %></p>
+    <% } %>
+
+    <form action="/reserve" method="POST">
+      <div class="form-group">
+        <label for="name">お名前</label>
+        <input type="text" id="name" name="name" placeholder="山田 太郎" required>
+      </div>
+      <div class="form-group">
+        <label for="count">人数</label>
+        <input type="number" id="count" name="count" min="1" max="10" placeholder="1" required>
+      </div>
+      <button type="submit">予約する</button>
+    </form>
+  </div>
+</body>
+</html>
