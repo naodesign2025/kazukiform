@@ -260,6 +260,25 @@ tr:hover td {
   margin-bottom: 12px;
 }
 
+/* Delete button in reservation table */
+.delete-btn {
+  padding: 5px 12px;
+  background: #fff;
+  color: #dc2626;
+  border: 1.5px solid #dc2626;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.2s, color 0.2s;
+}
+
+.delete-btn:hover {
+  background: #dc2626;
+  color: #fff;
+}
+
 /* Admin message on thanks page */
 .admin-message {
   background: #fffbeb;

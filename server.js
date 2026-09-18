@@ -139,6 +139,12 @@ app.get('/cancel', (req, res) => {
   res.render('index', { error: '決済がキャンセルされました。もう一度お試しください。' });
 });
 
+// 予約削除
+app.post('/admin/reservations/:id/delete', async (req, res) => {
+  await pool.query('DELETE FROM reservations WHERE id = $1', [req.params.id]);
+  res.redirect('/admin');
+});
+
 // 管理者ページ
 app.get('/admin', async (req, res) => {
   const { rows: reservations } = await pool.query('SELECT * FROM reservations ORDER BY created_at DESC');
