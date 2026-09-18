@@ -54,6 +54,7 @@
             <th>お名前</th>
             <th>人数</th>
             <th>予約日時</th>
+            <th>支払い</th>
             <th></th>
           </tr>
         </thead>
@@ -64,6 +65,13 @@
               <td><%= r.name %></td>
               <td><%= r.count %>名</td>
               <td><%= new Date(r.created_at).toLocaleString('ja-JP') %></td>
+              <td>
+                <% if (r.payment_status === 'paid') { %>
+                  <span class="badge badge-paid">決済済み</span>
+                <% } else { %>
+                  <span class="badge badge-unpaid">未決済</span>
+                <% } %>
+              </td>
               <td>
                 <form action="/admin/reservations/<%= r.id %>/delete" method="POST" onsubmit="return confirm('<%= r.name %>様の予約を削除しますか？')">
                   <button type="submit" class="delete-btn">削除</button>

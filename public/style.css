@@ -260,6 +260,26 @@ tr:hover td {
   margin-bottom: 12px;
 }
 
+/* Payment status badges */
+.badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.badge-paid {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.badge-unpaid {
+  background: #f3f4f6;
+  color: #9ca3af;
+}
+
 /* Delete button in reservation table */
 .delete-btn {
   padding: 5px 12px;

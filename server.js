@@ -45,6 +45,33 @@ async function getSettings() {
   return rows[0] || null;
 }
 
+// Stripe Webhook
+// express.raw() をルート固有で使用し、署名検証に必要な生のボディを取得する
+app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
+  const sig = req.headers['stripe-signature'];
+  let event;
+
+  try {
+    event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
+  } catch (err) {
+    console.error('Webhook署名エラー:', err.message);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+
+  if (event.type === 'checkout.session.completed') {
+    const session = event.data.object;
+    const reservationId = session.metadata && session.metadata.reservation_id;
+    if (reservationId) {
+      await pool.query(
+        'UPDATE reservations SET payment_status = $1 WHERE id = $2',
+        ['paid', parseInt(reservationId)]
+      );
+    }
+  }
+
+  res.json({ received: true });
+});
+
 // 予約フォーム
 app.get('/', (req, res) => {
   res.render('index');

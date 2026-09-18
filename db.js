@@ -32,6 +32,10 @@ async function initDB() {
   `);
 
   await pool.query(`
+    ALTER TABLE reservations ADD COLUMN IF NOT EXISTS payment_status TEXT DEFAULT 'unpaid'
+  `);
+
+  await pool.query(`
     INSERT INTO settings (id, image_filename, message, ticket_price)
     VALUES (1, NULL, NULL, 0)
     ON CONFLICT (id) DO NOTHING
