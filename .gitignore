@@ -2,3 +2,6 @@ node_modules/
 .env
 *.db
 public/uploads/
+
+# 一時スクリプト（使用後は削除予定）
+# create-connect-account.js
