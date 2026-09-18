@@ -24,8 +24,12 @@ async function initDB() {
   `);
 
   await pool.query(`
-    INSERT INTO settings (id, image_filename, message)
-    VALUES (1, NULL, NULL)
+    ALTER TABLE settings ADD COLUMN IF NOT EXISTS ticket_price INTEGER DEFAULT 0
+  `);
+
+  await pool.query(`
+    INSERT INTO settings (id, image_filename, message, ticket_price)
+    VALUES (1, NULL, NULL, 0)
     ON CONFLICT (id) DO NOTHING
   `);
 }

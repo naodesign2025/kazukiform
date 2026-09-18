@@ -3,6 +3,7 @@ const express = require('express');
 const nodemailer = require('nodemailer');
 const multer = require('multer');
 const path = require('path');
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const { pool, initDB } = require('./db');
 
 const storage = multer.diskStorage({
@@ -77,12 +78,61 @@ app.post('/reserve', async (req, res) => {
   }
 
   const settings = await getSettings();
+  const ticketPrice = settings && settings.ticket_price ? settings.ticket_price : 0;
+
+  // Stripe Checkout（チケット料金が設定されている場合）
+  if (ticketPrice > 0 && process.env.STRIPE_SECRET_KEY) {
+    const baseUrl = process.env.BASE_URL;
+    const successUrl = `${baseUrl}/thanks?name=${encodeURIComponent(name.trim())}&count=${parsedCount}&number=${reservationId}&session_id={CHECKOUT_SESSION_ID}`;
+    const cancelUrl = `${baseUrl}/cancel`;
+
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: [{
+        price_data: {
+          currency: 'jpy',
+          product_data: {
+            name: 'KAZUKI HORITSUGI SOLO LIVE チケット',
+          },
+          unit_amount: ticketPrice,
+        },
+        quantity: parsedCount,
+      }],
+      mode: 'payment',
+      success_url: successUrl,
+      cancel_url: cancelUrl,
+      metadata: {
+        reservation_id: String(reservationId),
+        name: name.trim(),
+        count: String(parsedCount),
+      },
+    });
+
+    return res.redirect(303, session.url);
+  }
+
+  // チケット料金未設定の場合はそのままthanksへ
   res.render('thanks', { name: name.trim(), count: parsedCount, number: reservationId, settings });
 });
 
-// お礼ページ（直接アクセスはフォームへリダイレクト）
-app.get('/thanks', (req, res) => {
-  res.redirect('/');
+// お礼ページ（Stripe決済完了後のリダイレクト先）
+app.get('/thanks', async (req, res) => {
+  const { name, count, number } = req.query;
+  if (!name || !count || !number) {
+    return res.redirect('/');
+  }
+  const settings = await getSettings();
+  res.render('thanks', {
+    name: decodeURIComponent(name),
+    count: parseInt(count),
+    number: parseInt(number),
+    settings,
+  });
+});
+
+// 決済キャンセル
+app.get('/cancel', (req, res) => {
+  res.render('index', { error: '決済がキャンセルされました。もう一度お試しください。' });
 });
 
 // 管理者ページ
@@ -96,13 +146,17 @@ app.get('/admin', async (req, res) => {
 // 管理者設定保存
 app.post('/admin/settings', upload.single('image'), async (req, res) => {
   const message = req.body.message || null;
+  const ticketPrice = parseInt(req.body.ticket_price) || 0;
   if (req.file) {
     await pool.query(
-      'UPDATE settings SET image_filename = $1, message = $2 WHERE id = 1',
-      [req.file.filename, message]
+      'UPDATE settings SET image_filename = $1, message = $2, ticket_price = $3 WHERE id = 1',
+      [req.file.filename, message, ticketPrice]
     );
   } else {
-    await pool.query('UPDATE settings SET message = $1 WHERE id = 1', [message]);
+    await pool.query(
+      'UPDATE settings SET message = $1, ticket_price = $2 WHERE id = 1',
+      [message, ticketPrice]
+    );
   }
   res.redirect('/admin');
 });

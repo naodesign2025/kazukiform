@@ -25,6 +25,11 @@
           <small>アップロードしない場合は現在の画像を維持します</small>
         </div>
         <div class="form-group">
+          <label for="ticket_price">チケット料金（円）</label>
+          <input type="number" id="ticket_price" name="ticket_price" min="0" value="<%= (settings && settings.ticket_price) ? settings.ticket_price : 0 %>" placeholder="例: 3000">
+          <small>0の場合はStripe決済をスキップします</small>
+        </div>
+        <div class="form-group">
           <label for="message">メッセージ</label>
           <textarea id="message" name="message" rows="4" placeholder="予約完了ページに表示するメッセージを入力..."><%= (settings && settings.message) ? settings.message : '' %></textarea>
         </div>
