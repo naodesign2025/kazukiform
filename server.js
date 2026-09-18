@@ -91,7 +91,7 @@ app.post('/reserve', async (req, res) => {
         price_data: {
           currency: 'jpy',
           product_data: {
-            name: 'KAZUKI HORITSUGI SOLO LIVE チケット',
+            name: settings.live_title || 'KAZUKI HORITSUGI SOLO LIVE チケット',
           },
           unit_amount: ticketPrice,
         },
@@ -151,15 +151,16 @@ app.get('/admin', async (req, res) => {
 app.post('/admin/settings', upload.single('image'), async (req, res) => {
   const message = req.body.message || null;
   const ticketPrice = parseInt(req.body.ticket_price) || 0;
+  const liveTitle = req.body.live_title || 'KAZUKI HORITSUGI SOLO LIVE チケット';
   if (req.file) {
     await pool.query(
-      'UPDATE settings SET image_filename = $1, message = $2, ticket_price = $3 WHERE id = 1',
-      [req.file.filename, message, ticketPrice]
+      'UPDATE settings SET image_filename = $1, message = $2, ticket_price = $3, live_title = $4 WHERE id = 1',
+      [req.file.filename, message, ticketPrice, liveTitle]
     );
   } else {
     await pool.query(
-      'UPDATE settings SET message = $1, ticket_price = $2 WHERE id = 1',
-      [message, ticketPrice]
+      'UPDATE settings SET message = $1, ticket_price = $2, live_title = $3 WHERE id = 1',
+      [message, ticketPrice, liveTitle]
     );
   }
   res.redirect('/admin');

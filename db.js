@@ -28,6 +28,10 @@ async function initDB() {
   `);
 
   await pool.query(`
+    ALTER TABLE settings ADD COLUMN IF NOT EXISTS live_title TEXT DEFAULT 'KAZUKI HORITSUGI SOLO LIVE チケット'
+  `);
+
+  await pool.query(`
     INSERT INTO settings (id, image_filename, message, ticket_price)
     VALUES (1, NULL, NULL, 0)
     ON CONFLICT (id) DO NOTHING

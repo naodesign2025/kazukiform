@@ -25,6 +25,10 @@
           <small>アップロードしない場合は現在の画像を維持します</small>
         </div>
         <div class="form-group">
+          <label for="live_title">ライブタイトル（Stripe決済画面の商品名）</label>
+          <input type="text" id="live_title" name="live_title" value="<%= (settings && settings.live_title) ? settings.live_title : 'KAZUKI HORITSUGI SOLO LIVE チケット' %>" placeholder="KAZUKI HORITSUGI SOLO LIVE チケット">
+        </div>
+        <div class="form-group">
           <label for="ticket_price">チケット料金（円）</label>
           <input type="number" id="ticket_price" name="ticket_price" min="0" value="<%= (settings && settings.ticket_price) ? settings.ticket_price : 0 %>" placeholder="例: 3000">
           <small>0の場合はStripe決済をスキップします</small>
