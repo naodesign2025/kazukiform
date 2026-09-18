@@ -87,7 +87,6 @@ app.post('/reserve', async (req, res) => {
     const cancelUrl = `${baseUrl}/cancel`;
 
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
       line_items: [{
         price_data: {
           currency: 'jpy',
@@ -99,6 +98,11 @@ app.post('/reserve', async (req, res) => {
         quantity: parsedCount,
       }],
       mode: 'payment',
+      payment_method_options: {
+        konbini: {
+          expires_after_days: 3,
+        },
+      },
       success_url: successUrl,
       cancel_url: cancelUrl,
       metadata: {
