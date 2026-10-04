@@ -103,16 +103,18 @@ app.post('/reserve', async (req, res) => {
   );
   const reservationId = rows[0].id;
 
-  // メール通知
-  try {
-    await transporter.sendMail({
-      from: process.env.MAIL_USER,
-      to: process.env.ADMIN_EMAIL,
-      subject: '【ライブ予約】新しい予約が届きました',
-      text: `新しい予約が届きました。\n\nお名前：${name}\n人数：${parsedCount}名\n整理番号：${reservationId}番\n`,
-    });
-  } catch (err) {
-    console.error('メール送信エラー:', err.message);
+  // メール通知（MAIL_HOST 未設定時はスキップ）
+  if (process.env.MAIL_HOST) {
+    try {
+      await transporter.sendMail({
+        from: process.env.MAIL_USER,
+        to: process.env.ADMIN_EMAIL,
+        subject: '【ライブ予約】新しい予約が届きました',
+        text: `新しい予約が届きました。\n\nお名前：${name}\n人数：${parsedCount}名\n整理番号：${reservationId}番\n`,
+      });
+    } catch (err) {
+      console.error('メール送信エラー:', err.message);
+    }
   }
 
   const settings = await getSettings();
@@ -124,31 +126,38 @@ app.post('/reserve', async (req, res) => {
     const successUrl = `${baseUrl}/thanks?name=${encodeURIComponent(name.trim())}&count=${parsedCount}&number=${reservationId}&session_id={CHECKOUT_SESSION_ID}`;
     const cancelUrl = `${baseUrl}/cancel`;
 
-    const session = await stripe.checkout.sessions.create({
-      line_items: [{
-        price_data: {
-          currency: 'jpy',
-          product_data: {
-            name: settings.live_title || 'KAZUKI HORITSUGI SOLO LIVE チケット',
+    let session;
+    try {
+      session = await stripe.checkout.sessions.create({
+        line_items: [{
+          price_data: {
+            currency: 'jpy',
+            product_data: {
+              name: settings.live_title || 'KAZUKI HORITSUGI SOLO LIVE チケット',
+            },
+            unit_amount: ticketPrice,
           },
-          unit_amount: ticketPrice,
+          quantity: parsedCount,
+        }],
+        mode: 'payment',
+        automatic_tax: { enabled: false },
+        payment_method_options: {
+          konbini: {
+            expires_after_days: 3,
+          },
         },
-        quantity: parsedCount,
-      }],
-      mode: 'payment',
-      payment_method_options: {
-        konbini: {
-          expires_after_days: 3,
+        success_url: successUrl,
+        cancel_url: cancelUrl,
+        metadata: {
+          reservation_id: String(reservationId),
+          name: name.trim(),
+          count: String(parsedCount),
         },
-      },
-      success_url: successUrl,
-      cancel_url: cancelUrl,
-      metadata: {
-        reservation_id: String(reservationId),
-        name: name.trim(),
-        count: String(parsedCount),
-      },
-    });
+      });
+    } catch (err) {
+      console.error('Stripe Checkoutエラー:', err.message);
+      return res.render('index', { error: '決済処理でエラーが発生しました。しばらくしてから再度お試しください。' });
+    }
 
     return res.redirect(303, session.url);
   }
