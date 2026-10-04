@@ -3,7 +3,18 @@ const express = require('express');
 const nodemailer = require('nodemailer');
 const multer = require('multer');
 const path = require('path');
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+
+const STRIPE_MODE = process.env.STRIPE_MODE === 'live' ? 'live' : 'test';
+const stripeSecretKey = STRIPE_MODE === 'live'
+  ? process.env.STRIPE_SECRET_KEY_LIVE
+  : process.env.STRIPE_SECRET_KEY_TEST;
+const stripeWebhookSecret = STRIPE_MODE === 'live'
+  ? process.env.STRIPE_WEBHOOK_SECRET_LIVE
+  : process.env.STRIPE_WEBHOOK_SECRET_TEST;
+
+console.log(`[Stripe] mode: ${STRIPE_MODE}`);
+
+const stripe = require('stripe')(stripeSecretKey);
 const { pool, initDB } = require('./db');
 
 const storage = multer.diskStorage({
@@ -52,7 +63,7 @@ app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res)
   let event;
 
   try {
-    event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
+    event = stripe.webhooks.constructEvent(req.body, sig, stripeWebhookSecret);
   } catch (err) {
     console.error('Webhook署名エラー:', err.message);
     return res.status(400).send(`Webhook Error: ${err.message}`);
@@ -108,7 +119,7 @@ app.post('/reserve', async (req, res) => {
   const ticketPrice = settings && settings.ticket_price ? settings.ticket_price : 0;
 
   // Stripe Checkout（チケット料金が設定されている場合）
-  if (ticketPrice > 0 && process.env.STRIPE_SECRET_KEY) {
+  if (ticketPrice > 0 && stripeSecretKey) {
     const baseUrl = process.env.BASE_URL;
     const successUrl = `${baseUrl}/thanks?name=${encodeURIComponent(name.trim())}&count=${parsedCount}&number=${reservationId}&session_id={CHECKOUT_SESSION_ID}`;
     const cancelUrl = `${baseUrl}/cancel`;

@@ -3,7 +3,12 @@
 // 本番運用後は削除してよい
 
 require('dotenv').config();
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const STRIPE_MODE = process.env.STRIPE_MODE === 'live' ? 'live' : 'test';
+const stripeSecretKey = STRIPE_MODE === 'live'
+  ? process.env.STRIPE_SECRET_KEY_LIVE
+  : process.env.STRIPE_SECRET_KEY_TEST;
+console.log(`[Stripe] mode: ${STRIPE_MODE}`);
+const stripe = require('stripe')(stripeSecretKey);
 
 const email = process.argv[2];
 
