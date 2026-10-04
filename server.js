@@ -140,7 +140,7 @@ app.post('/reserve', async (req, res) => {
           quantity: parsedCount,
         }],
         mode: 'payment',
-        automatic_tax: { enabled: false },
+        managed_payments: { enabled: false },
         payment_method_options: {
           konbini: {
             expires_after_days: 3,
