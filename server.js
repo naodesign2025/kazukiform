@@ -94,10 +94,11 @@ app.post('/reserve', async (req, res) => {
   }
 
   const { rows } = await pool.query(
-    'INSERT INTO reservations (name, count) VALUES ($1, $2) RETURNING id',
+    'INSERT INTO reservations (name, count) VALUES ($1, $2) RETURNING id, serial_number',
     [name.trim(), parsedCount]
   );
   const reservationId = rows[0].id;
+  const serialNumber = rows[0].serial_number;
 
   // メール通知（MAIL_HOST 未設定時はスキップ）
   if (process.env.MAIL_HOST) {
@@ -106,7 +107,7 @@ app.post('/reserve', async (req, res) => {
         from: process.env.MAIL_USER,
         to: process.env.ADMIN_EMAIL,
         subject: '【ライブ予約】新しい予約が届きました',
-        text: `新しい予約が届きました。\n\nお名前：${name}\n人数：${parsedCount}名\n整理番号：${reservationId}番\n`,
+        text: `新しい予約が届きました。\n\nお名前：${name}\n人数：${parsedCount}名\n整理番号：${serialNumber}番\n`,
       });
     } catch (err) {
       console.error('メール送信エラー:', err.message);
@@ -119,7 +120,7 @@ app.post('/reserve', async (req, res) => {
   // Stripe Checkout（チケット料金が設定されている場合）
   if (ticketPrice > 0 && stripeSecretKey) {
     const baseUrl = process.env.BASE_URL;
-    const successUrl = `${baseUrl}/thanks?name=${encodeURIComponent(name.trim())}&count=${parsedCount}&number=${reservationId}&session_id={CHECKOUT_SESSION_ID}`;
+    const successUrl = `${baseUrl}/thanks?name=${encodeURIComponent(name.trim())}&count=${parsedCount}&number=${serialNumber}&session_id={CHECKOUT_SESSION_ID}`;
     const cancelUrl = `${baseUrl}/cancel`;
 
     let session;
@@ -159,7 +160,7 @@ app.post('/reserve', async (req, res) => {
   }
 
   // チケット料金未設定の場合はそのままthanksへ
-  res.render('thanks', { name: name.trim(), count: parsedCount, number: reservationId, settings });
+  res.render('thanks', { name: name.trim(), count: parsedCount, number: serialNumber, settings });
 });
 
 // お礼ページ（Stripe決済完了後のリダイレクト先）

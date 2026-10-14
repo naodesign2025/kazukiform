@@ -60,6 +60,47 @@ async function initDB() {
     VALUES (1, NULL, NULL, 0)
     ON CONFLICT (id) DO NOTHING
   `);
+
+  // serial_number: お客さんに見せる整理番号（DBのidとは別に管理）
+  await pool.query(`
+    ALTER TABLE reservations ADD COLUMN IF NOT EXISTS serial_number INTEGER
+  `);
+
+  // シーケンスを作成（すでに存在する場合はスキップ）
+  await pool.query(`
+    CREATE SEQUENCE IF NOT EXISTS reservation_serial_seq START 1
+  `);
+
+  // 既存レコードのうち serial_number が未設定(NULL)のものだけを id 順に採番
+  // ROW_NUMBER は全レコードの id 順位で計算するため、何度実行しても同じ結果になる
+  await pool.query(`
+    UPDATE reservations
+    SET serial_number = sub.rn
+    FROM (
+      SELECT id, ROW_NUMBER() OVER (ORDER BY id) AS rn
+      FROM reservations
+    ) sub
+    WHERE reservations.id = sub.id
+    AND reservations.serial_number IS NULL
+  `);
+
+  // シーケンスを現在の最大値に合わせる
+  // 空テーブル時は setval(seq, 1, false) → 次の nextval() が 1 を返す
+  // レコードあり(最大値=N)のときは setval(seq, N, true) → 次の nextval() が N+1 を返す
+  await pool.query(`
+    SELECT setval(
+      'reservation_serial_seq',
+      CASE WHEN MAX(serial_number) IS NULL THEN 1 ELSE MAX(serial_number) END,
+      MAX(serial_number) IS NOT NULL
+    )
+    FROM reservations
+  `);
+
+  // 新規 INSERT 時にシーケンスから自動採番されるよう DEFAULT を設定
+  await pool.query(`
+    ALTER TABLE reservations
+    ALTER COLUMN serial_number SET DEFAULT nextval('reservation_serial_seq')
+  `);
 }
 
 module.exports = { pool, initDB };

@@ -77,9 +77,9 @@
           </tr>
         </thead>
         <tbody>
-          <% reservations.forEach((r, i) => { %>
+          <% reservations.forEach((r) => { %>
             <tr>
-              <td><%= reservations.length - i %></td>
+              <td><%= r.serial_number %></td>
               <td><%= r.name %></td>
               <td><%= r.count %>名</td>
               <td><%= new Date(r.created_at).toLocaleString('ja-JP') %></td>
