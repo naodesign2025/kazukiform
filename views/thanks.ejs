@@ -8,10 +8,10 @@
 </head>
 <body>
   <div class="container thanks">
-    <% if (settings && settings.image_filename) { %>
-      <img src="/uploads/<%= settings.image_filename %>" alt="KAZUKI" class="top-image">
+    <% if (settings && settings.has_image) { %>
+      <img src="/admin/image" alt="イベント画像" class="top-image">
     <% } else { %>
-      <img src="/images/kazuki.png" alt="KAZUKI" class="top-image">
+      <p class="thanks-title">ご予約ありがとうございました</p>
     <% } %>
 
     <p class="event-title">-堀次一輝ソロライブについて-</p>

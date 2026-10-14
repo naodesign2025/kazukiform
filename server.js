@@ -17,15 +17,9 @@ console.log(`[Stripe] mode: ${STRIPE_MODE}`);
 const stripe = require('stripe')(stripeSecretKey);
 const { pool, initDB } = require('./db');
 
-const storage = multer.diskStorage({
-  destination: 'public/uploads/',
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    cb(null, `admin-image-${Date.now()}${ext}`);
-  },
-});
 const upload = multer({
-  storage,
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 2 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     const allowed = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
     cb(null, allowed.includes(path.extname(file.originalname).toLowerCase()));
@@ -52,7 +46,9 @@ const transporter = nodemailer.createTransport({
 });
 
 async function getSettings() {
-  const { rows } = await pool.query('SELECT * FROM settings WHERE id = 1');
+  const { rows } = await pool.query(
+    'SELECT id, image_filename, message, ticket_price, live_title, image_mime, (image_data IS NOT NULL) AS has_image FROM settings WHERE id = 1'
+  );
   return rows[0] || null;
 }
 
@@ -192,31 +188,53 @@ app.post('/admin/reservations/:id/delete', async (req, res) => {
   res.redirect('/admin');
 });
 
+// 設定画像の配信
+app.get('/admin/image', async (req, res) => {
+  const { rows } = await pool.query('SELECT image_data, image_mime FROM settings WHERE id = 1');
+  const row = rows[0];
+  if (!row || !row.image_data) {
+    return res.status(404).end();
+  }
+  res.set('Content-Type', row.image_mime || 'image/jpeg');
+  res.send(row.image_data);
+});
+
 // 管理者ページ
 app.get('/admin', async (req, res) => {
   const { rows: reservations } = await pool.query('SELECT * FROM reservations ORDER BY created_at DESC');
   const total = reservations.reduce((sum, r) => sum + r.count, 0);
   const settings = await getSettings();
-  res.render('admin', { reservations, total, settings });
+  const error = req.query.error || null;
+  res.render('admin', { reservations, total, settings, error });
 });
 
 // 管理者設定保存
-app.post('/admin/settings', upload.single('image'), async (req, res) => {
-  const message = req.body.message || null;
-  const ticketPrice = parseInt(req.body.ticket_price) || 0;
-  const liveTitle = req.body.live_title || 'KAZUKI HORITSUGI SOLO LIVE チケット';
-  if (req.file) {
-    await pool.query(
-      'UPDATE settings SET image_filename = $1, message = $2, ticket_price = $3, live_title = $4 WHERE id = 1',
-      [req.file.filename, message, ticketPrice, liveTitle]
-    );
-  } else {
-    await pool.query(
-      'UPDATE settings SET message = $1, ticket_price = $2, live_title = $3 WHERE id = 1',
-      [message, ticketPrice, liveTitle]
-    );
-  }
-  res.redirect('/admin');
+app.post('/admin/settings', (req, res) => {
+  upload.single('image')(req, res, async (err) => {
+    if (err && err.code === 'LIMIT_FILE_SIZE') {
+      return res.redirect('/admin?error=' + encodeURIComponent('画像サイズが大きすぎます。2MB以下の画像を選択してください。'));
+    }
+    if (err) {
+      return res.redirect('/admin?error=' + encodeURIComponent('画像のアップロードに失敗しました。'));
+    }
+
+    const message = req.body.message || null;
+    const ticketPrice = parseInt(req.body.ticket_price) || 0;
+    const liveTitle = req.body.live_title || 'KAZUKI HORITSUGI SOLO LIVE チケット';
+
+    if (req.file) {
+      await pool.query(
+        'UPDATE settings SET image_data = $1, image_mime = $2, message = $3, ticket_price = $4, live_title = $5 WHERE id = 1',
+        [req.file.buffer, req.file.mimetype, message, ticketPrice, liveTitle]
+      );
+    } else {
+      await pool.query(
+        'UPDATE settings SET message = $1, ticket_price = $2, live_title = $3 WHERE id = 1',
+        [message, ticketPrice, liveTitle]
+      );
+    }
+    res.redirect('/admin');
+  });
 });
 
 initDB()

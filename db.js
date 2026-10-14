@@ -32,6 +32,14 @@ async function initDB() {
   `);
 
   await pool.query(`
+    ALTER TABLE settings ADD COLUMN IF NOT EXISTS image_data BYTEA
+  `);
+
+  await pool.query(`
+    ALTER TABLE settings ADD COLUMN IF NOT EXISTS image_mime TEXT
+  `);
+
+  await pool.query(`
     ALTER TABLE reservations ADD COLUMN IF NOT EXISTS payment_status TEXT DEFAULT 'unpaid'
   `);
 

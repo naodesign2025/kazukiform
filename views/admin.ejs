@@ -12,17 +12,20 @@
 
     <section class="admin-settings">
       <h2>予約完了ページの設定</h2>
+      <% if (error) { %>
+        <p class="error"><%= error %></p>
+      <% } %>
       <form action="/admin/settings" method="POST" enctype="multipart/form-data">
         <div class="form-group">
           <label>表示画像</label>
-          <% if (settings && settings.image_filename) { %>
+          <% if (settings && settings.has_image) { %>
             <div class="current-image">
-              <img src="/uploads/<%= settings.image_filename %>" alt="現在の画像" style="max-width:200px; display:block; margin-bottom:8px;">
+              <img src="/admin/image" alt="現在の画像" style="max-width:200px; display:block; margin-bottom:8px;">
               <small>現在設定中の画像</small>
             </div>
           <% } %>
           <input type="file" name="image" accept="image/*">
-          <small>アップロードしない場合は現在の画像を維持します</small>
+          <small>アップロードしない場合は現在の画像を維持します（上限2MB）</small>
         </div>
         <div class="form-group">
           <label for="live_title">ライブタイトル（Stripe決済画面の商品名）</label>
