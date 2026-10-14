@@ -14,11 +14,17 @@
       <p class="thanks-title">ご予約ありがとうございました</p>
     <% } %>
 
-    <p class="event-title">-堀次一輝ソロライブについて-</p>
+    <% if (settings && settings.event_title) { %>
+      <p class="event-title">-<%= settings.event_title %>-</p>
+    <% } %>
 
     <p class="thanks-body">
-      この度は2026年8月16日(日)開催、<br>
-      【KAZUKI HORITSUGI SOLO LIVE】の<br>
+      <% if (settings && settings.event_date) { %>
+        この度は<%= settings.event_date %>開催、<br>
+      <% } %>
+      <% if (settings && settings.event_name) { %>
+        【<%= settings.event_name %>】の<br>
+      <% } %>
       ご予約いただき、ありがとうございます。
     </p>
 

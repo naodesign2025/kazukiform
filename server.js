@@ -47,7 +47,7 @@ const transporter = nodemailer.createTransport({
 
 async function getSettings() {
   const { rows } = await pool.query(
-    'SELECT id, image_filename, message, ticket_price, live_title, image_mime, (image_data IS NOT NULL) AS has_image FROM settings WHERE id = 1'
+    'SELECT id, image_filename, message, ticket_price, live_title, image_mime, (image_data IS NOT NULL) AS has_image, event_title, event_date, event_name FROM settings WHERE id = 1'
   );
   return rows[0] || null;
 }
@@ -129,7 +129,7 @@ app.post('/reserve', async (req, res) => {
           price_data: {
             currency: 'jpy',
             product_data: {
-              name: settings.live_title || 'KAZUKI HORITSUGI SOLO LIVE チケット',
+              name: settings.live_title || 'ライブチケット',
             },
             unit_amount: ticketPrice,
           },
@@ -220,17 +220,20 @@ app.post('/admin/settings', (req, res) => {
 
     const message = req.body.message || null;
     const ticketPrice = parseInt(req.body.ticket_price) || 0;
-    const liveTitle = req.body.live_title || 'KAZUKI HORITSUGI SOLO LIVE チケット';
+    const liveTitle = req.body.live_title || 'ライブチケット';
+    const eventTitle = req.body.event_title || null;
+    const eventDate = req.body.event_date || null;
+    const eventName = req.body.event_name || null;
 
     if (req.file) {
       await pool.query(
-        'UPDATE settings SET image_data = $1, image_mime = $2, message = $3, ticket_price = $4, live_title = $5 WHERE id = 1',
-        [req.file.buffer, req.file.mimetype, message, ticketPrice, liveTitle]
+        'UPDATE settings SET image_data = $1, image_mime = $2, message = $3, ticket_price = $4, live_title = $5, event_title = $6, event_date = $7, event_name = $8 WHERE id = 1',
+        [req.file.buffer, req.file.mimetype, message, ticketPrice, liveTitle, eventTitle, eventDate, eventName]
       );
     } else {
       await pool.query(
-        'UPDATE settings SET message = $1, ticket_price = $2, live_title = $3 WHERE id = 1',
-        [message, ticketPrice, liveTitle]
+        'UPDATE settings SET message = $1, ticket_price = $2, live_title = $3, event_title = $4, event_date = $5, event_name = $6 WHERE id = 1',
+        [message, ticketPrice, liveTitle, eventTitle, eventDate, eventName]
       );
     }
     res.redirect('/admin');

@@ -28,7 +28,19 @@ async function initDB() {
   `);
 
   await pool.query(`
-    ALTER TABLE settings ADD COLUMN IF NOT EXISTS live_title TEXT DEFAULT 'KAZUKI HORITSUGI SOLO LIVE チケット'
+    ALTER TABLE settings ADD COLUMN IF NOT EXISTS live_title TEXT DEFAULT 'ライブチケット'
+  `);
+
+  await pool.query(`
+    ALTER TABLE settings ADD COLUMN IF NOT EXISTS event_title TEXT
+  `);
+
+  await pool.query(`
+    ALTER TABLE settings ADD COLUMN IF NOT EXISTS event_date TEXT
+  `);
+
+  await pool.query(`
+    ALTER TABLE settings ADD COLUMN IF NOT EXISTS event_name TEXT
   `);
 
   await pool.query(`

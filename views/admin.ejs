@@ -28,8 +28,23 @@
           <small>アップロードしない場合は現在の画像を維持します（上限2MB）</small>
         </div>
         <div class="form-group">
+          <label for="event_title">イベントタイトル（お礼ページの見出し）</label>
+          <input type="text" id="event_title" name="event_title" value="<%= (settings && settings.event_title) ? settings.event_title : '' %>" placeholder="例: ○○ソロライブについて">
+          <small>空の場合は非表示になります</small>
+        </div>
+        <div class="form-group">
+          <label for="event_date">開催日（お礼ページに表示）</label>
+          <input type="text" id="event_date" name="event_date" value="<%= (settings && settings.event_date) ? settings.event_date : '' %>" placeholder="例: 2026年8月16日(日)">
+          <small>空の場合は非表示になります</small>
+        </div>
+        <div class="form-group">
+          <label for="event_name">イベント名（お礼ページに表示）</label>
+          <input type="text" id="event_name" name="event_name" value="<%= (settings && settings.event_name) ? settings.event_name : '' %>" placeholder="例: ○○ SOLO LIVE">
+          <small>空の場合は非表示になります</small>
+        </div>
+        <div class="form-group">
           <label for="live_title">ライブタイトル（Stripe決済画面の商品名）</label>
-          <input type="text" id="live_title" name="live_title" value="<%= (settings && settings.live_title) ? settings.live_title : 'KAZUKI HORITSUGI SOLO LIVE チケット' %>" placeholder="KAZUKI HORITSUGI SOLO LIVE チケット">
+          <input type="text" id="live_title" name="live_title" value="<%= (settings && settings.live_title) ? settings.live_title : 'ライブチケット' %>" placeholder="ライブチケット">
         </div>
         <div class="form-group">
           <label for="ticket_price">チケット料金（円）</label>
